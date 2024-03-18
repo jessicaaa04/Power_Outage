@@ -92,9 +92,9 @@ In order to increase the readability of the data and performance of our model, w
 
 - **Check the datatypes of each column, especially the columns related to datetime**: The `OUTAGE.START.DATE`, `OUTAGE.START.DATE`, `OUTAGE.RESTORATION.DATE`, `OUTAGE.RESTORATION.TIME` columns in the dataframe are stored as objects. We converted it into datetime data type so that we can apply basic operations later. Convert numerical columns such as `ANOMALY.LEVEL`, `OUTAGE.DURATION`, `DEMAND.LOSS.MW`, etc., into float or int types.
 
-- **Merging date and time into a single column**: This process creates a more comprehensive and accurate representation of specific events or records in a dataset. The resulting singular datetime column then allows for more efficient sorting, filtering, and time series analysis within the data.
+- **Merge date and time into a single column**: This process creates a more comprehensive and accurate representation of specific events or records in a dataset. The resulting singular datetime column then allows for more efficient sorting, filtering, and time series analysis within the data.
 
-- **Adding time duration in hours**: By extracting the day of the week from the outage start and restoration times, we can observe and analyze patterns in outage occurrences and recovery times across different days.
+- **Add time duration in hours**: By extracting the day of the week from the outage start and restoration times, we can observe and analyze patterns in outage occurrences and recovery times across different days.
 
 After cleaning the dataframe, the dataframe looks like ths following (only showing the first 5 rows and part of the crucial columns for illustration):
 
