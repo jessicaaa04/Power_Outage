@@ -117,7 +117,7 @@ Here is a histogram on the distribution of the duration in hours of power outage
 
 Since the data is right-skewed, most outages are short-lived, but there are a few that last much longer and can skew averages. For a thorough risk assessment, an energy company should use median or a range of percentiles for more representatie comparison, and analyze outliers separately to understand the causes behind prolonged outages and to identify any patters in these extreme cases.
 
-<iframe src="figures/duration_by_state.html" width=800 height=600 frameBorder=0></iframe>
+<iframe src="figures/duration_dist.html" width=800 height=600 frameBorder=0></iframe>
 
 #### Distribution of Anomaly Level
 
