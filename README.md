@@ -184,7 +184,7 @@ These states show notable figures in certain years (e.g., Florida in 2005 and Ar
 
 To explore whether missing values are Missing At Random (MAR) or Not Missing At Random (NMAR), we typically look for patterns in the missing data. If the presence of missing data is related to observed data, it might be MAR; if it's related to unobserved data, it might be NMAR. We visualized the number of missing values in each column. This allows us to focus more specifically on exploring the patterns of missingness within certain columns.
 
-<iframe src="missing_values_proportion.html" width=800 height=600 frameBorder=0></iframe>
+<iframe src="figures/missing_values_proportion.html" width=800 height=600 frameBorder=0></iframe>
 
 ### NMAR Analysis
 
