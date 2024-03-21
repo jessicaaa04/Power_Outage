@@ -209,7 +209,7 @@ However, the `CUSTOMERS.AFFECTED` column could be MAR if we have internal report
 
 Since we are interested in the characteristics of major power outages, we belive that one possible feature could be represented by the `CAUSE.CATEGORY.DETAIL` column. Intuitively, the `CAUSE.CATEGORY.DETAIL` column depends on the `CAUSE.CATEGORY` column, which, notably, does not have any missing values. Hence, we want to know whether the missingness of `CAUSE.CATEGORY.DETAIL` depends on other columns or not. To validate our hypothesis, we conducted pertumatition tests to examine the relationship. Specifically, we chose to investigate the dependency of the missingness of `CAUSE.CATEGORY.DETAIL` on two columns: `NERC.REGION` and `U.S._STATE`. 
 
-1. `CAUSE.CATEGORY.DETAIL` and `NERC.REGION` (NMAR)
+1.`CAUSE.CATEGORY.DETAIL` and `NERC.REGION` (NMAR)
 
 **Null Hypothesis**: The missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `NERC.REGION`.
 
@@ -225,7 +225,7 @@ Below shows the empirical distribution of our test statistics in 10,000 permutat
 
 Since the p value after running permutation is test is 0.3587 which is greater than our chosen significance level of 5%, we failed to reject the null hypothesis that the missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `NERC.REGION`. Therefore, we conclude that **it is highly possible that the missingness of `CAUSE.CATEGORY.DETAIL` does not depend on the `NERC.REGION` column**.
 
-2. `CAUSE.CATEGORY.DETAIL` and `U.S._STATE` (MAR)
+2.`CAUSE.CATEGORY.DETAIL` and `U.S._STATE` (MAR)
 
 **Null Hypothesis**: The missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `U.S._STATE`.
 
