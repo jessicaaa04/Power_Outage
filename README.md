@@ -98,6 +98,8 @@ To explore further about the question, we decided to assign some new columns:
 
 - **Adding time duration in hours**: By extracting the day of the week from the outage start and restoration times, we can observe and analyze patterns in outage occurrences and recovery times across different days.
 
+- **Adding day for start and restoration**: By identifying the specific days on which power outages begin and end, we can better understand the temporal patterns of outages and assess their impact more accurately."
+
 - **Adding climate severity value and severity category columns**: By quantifying the anomaly level of weather conditions (how much hotter, colder, wetter, or drier it is than usual), we can directly link the severity of weather conditions to the frequency and duration of power outages. The value in the "Climate Severity" column represents the degree of anomaly in weather conditions at the time of the outage. Higher values indicate more extreme weather conditions relative to the historical norm for that region and time of year. While the "Climate Severity" provides a quantitative measure of weather conditions' extremity, the "Severity Category" simplifies this information into qualitative categories. This categorization makes it easier to analyze and communicate the data, especially for non-technical stakeholders. It helps in quickly identifying patterns and trends without needing to interpret specific numerical values.
 
 Overall, adding new columns facilitates the comparison of outage characteristics across different severity levels, enabling targeted investigations into the resilience of power systems under various weather scenarios.
@@ -135,7 +137,7 @@ This figure suggests that the distribution could be approximated as a Gaussian d
 
 ### Bivariate Analysis
 
-To identify potential correlations within the data, bivariate analysis is essential for exploring and understanding the relationship between two variables. In the first figure, we used boxplot to illustrate the relationship between cause category and outrage duration in hours.
+To identify potential correlations within the data, bivariate analysis is essential for exploring and understanding the relationship between two variables. In the figure, we used boxplot to illustrate the relationship between cause category and outrage duration in hours.
 
 <iframe src="figures/cause_duration.html" width=800 height=600 frameBorder=0></iframe>
 
@@ -186,6 +188,8 @@ To explore whether missing values are Missing At Random (MAR) or Not Missing At 
 
 <iframe src="figures/missing_values_proportion.html" width=800 height=600 frameBorder=0></iframe>
 
+Assuming significant missing values refer to a missing proportion greater than 0.2, the chart indicates several columns with a significant number of missing values: `CAUSE.CATEGORY.DETAIL`, `HURRICANE.NAMES`, `DEMAND.LOSS.MW`, `CUSTOMERS.AFFECTED`.
+
 ### NMAR Analysis
 
 One of the column in our dataset with missing values that is possibly NMAR is the `CUSTOMERS.AFFECTED` column. In large-scale outages, especially those caused by natural disasters or catastrophic events, the precise number of customers affected can be challenging to ascertain. Utilities may face difficulties in:
@@ -203,9 +207,58 @@ However, the `CUSTOMERS.AFFECTED` column could be MAR if we have internal report
 
 ### Missingness Dependency
 
+Since we are interested in the characteristics of major power outages, we belive that one possible feature could be represented by the `CAUSE.CATEGORY.DETAIL` column. Intuitively, the `CAUSE.CATEGORY.DETAIL` column depends on the `CAUSE.CATEGORY` column, which, notably, does not have any missing values. Hence, we want to know whether the missingness of `CAUSE.CATEGORY.DETAIL` depends on other columns or not. To validate our hypothesis, we conducted pertumatition tests to examine the relationship. Specifically, we chose to investigate the dependency of the missingness of `CAUSE.CATEGORY.DETAIL` on two columns: `NERC.REGION` and `U.S._STATE`. 
+
+1. `CAUSE.CATEGORY.DETAIL` and `NERC.REGION` (NMAR)
+
+**Null Hypothesis**: The missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `NERC.REGION`.
+
+**Alternative Hypothesis**: The missingness of `CAUSE.CATEGORY.DETAIL` depends on `NERC.REGION`.
+
+Since `NERC.REGION` is categorical, we should implement *total variance distance(TVD)* in our permutation test. 
+
+We created a new column `is_missing` indicating the missingness status of the `CAUSE.CATEGORY.DETAIL` and then shuffled the `NERC.REGION` column for our permutation. 
+
+Below shows the empirical distribution of our test statistics in 10,000 permutations, the red line indicates the observed test statistic.
+
+<iframe src="figures/NERC_CAUSE.html" width=800 height=600 frameBorder=0></iframe>
+
+Since the p value after running permutation is test is 0.3587 which is greater than our chosen significance level of 5%, we failed to reject the null hypothesis that the missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `NERC.REGION`. Therefore, we conclude that **it is highly possible that the missingness of `CAUSE.CATEGORY.DETAIL` does not depend on the `NERC.REGION` column**.
+
+2. `CAUSE.CATEGORY.DETAIL` and `U.S._STATE` (MAR)
+
+**Null Hypothesis**: The missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `U.S._STATE`.
+
+**Alternative Hypothesis**: The missingness of `CAUSE.CATEGORY.DETAIL` depends on `U.S._STATE`.
+
+Since `U.S._STATE` is categorical, we should also implement *total variance distance(TVD)* in our permutation test. 
+
+Similarly, we created a new column `is_missing` indicating the missingness status of the `CAUSE.CATEGORY.DETAIL` and then shuffled the `U.S._STATE` column for our permutation. 
+
+Below shows the empirical distribution of our test statistics in 10,000 permutations, the red line indicates the observed test statistic.
+
+<iframe src="figures/STATE_CAUSE.html" width=800 height=600 frameBorder=0></iframe>
+
+Since the p value after running permutation is test is 0.0049 which is smaller than our chosen significance level of 5%, we rejected the null hypothesis that the missingness of `CAUSE.CATEGORY.DETAIL` *does not* depend on `U.S._STATE`. Therefore, we conclude that **it is highly possible that the missingness of `CAUSE.CATEGORY.DETAIL` depends on the `U.S._STATE` column**.
+
 ---
 
 ## Hypothesis Testing
+
+To unravel the characteristics of major power outages with heightened severity, we have formulated a research question that focuses on the relationship between outage severity, as indicated by the number of customers affected. and total electricity sales. For our analysis, we've posited the following hypotheses:
+
+**Null Hypothesis**: The severity of major power outages ***is not related*** to the `TOTAL.SALES`.
+**Alternative Hypothesis**: The severity of major power outages ***is related*** to the `TOTAL.SALES`.
+
+To test these hypotheses, we've implemented a permutation test that assesses the significance of the observed difference in means between outages with high and low total sales. Since the distribution is numerical, our test statistic is the **absolute difference** in the average number of customers affected for outages above and below the median of `TOTAL.SALES`. By randomly shuffling the `TOTAL.SALES` data and recalculating the difference in means 10,000 times, we simulate the distribution of our test statistic under the null hypothesis.
+
+Below is the empirical distribution of our test statistic, derived from these permutations, and the red line indicates the observed test statistic:
+
+<iframe src="figures/Customer_Sales.html" width=800 height=600 frameBorder=0></iframe>
+
+**Significance Level**: 5%
+
+Since the p value after running permutation is test is 0.0 which is smaller than our chosen significance level of 5%, we **rejected the null hypothesis** that the severity of major power outages ***is not related*** to the `TOTAL.SALES`. 
 
 ---
 
@@ -216,6 +269,18 @@ Building on our comprehensive analysis of the factors affecting power outages an
 The focal point of our prediction is a binary classification of the `CAUSE.CATEGORY`, specifically determining if an outage was caused by *"severe weather"* as opposed to other causes. This binary approach streamlines our analysis, allowing for a targeted investigation into one of the most common and important causes of outages.
 
 Our evaluation strategy employs accuracy as the primary metric, complemented by a confusion matrix and a comprehensive classification report. The use of accuracy helps us directly assess the proportion of correct predictions made by the model, offering an intuitive understanding of its effectiveness.
+
+---
+
+## Baseline Model
+
+---
+
+## Final Model
+
+--
+
+## Fairness Analysis
 
 ---
 
