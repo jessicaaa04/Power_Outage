@@ -43,9 +43,13 @@ This is a data science project on predicting the causes of a major power outage.
 
 ## Introduction
 
+[Back to Top](#table-of-contents)
+
 Power exists everywhere in our lives, woven into the fabric of our daily routines and essential activities. We use power to brighten our homes, to charge the devices that keep us connected to the world, and to preserve the food that nourishes us. Imagine this: You're about to sit down for a family dinner or dive into a critical work project when suddenly, everything goes dark. The power's out, again. Frustration kicks in, plans get disrupted, and the uncertainty of when things will return to normal looms over you. This scenario is far too common for many of us and highlights a pressing issue in our modern lives—the vulnerability of our power systems to outages. The Department of Energy defines large outages as those that impact at least 50,000 customers or result in an unscheduled firm load loss of at least 300 MW (Mukherjee et al. 2018).  *In order to minimize the inconveniences associated with power outages, we will uncover the cause of a major power outage in U.S.*
 
 ### Introduction to the Dataset in the Study
+
+[Back to Top](#table-of-contents)
 
 The dataset for power outages contains *1534* rows, each representing information on major outages experienced by different states from 2016 to 2020, with *55* columns regarding to the following information.
 
@@ -112,6 +116,8 @@ In the project, we used several key columns from the dataset to understand the f
 ---
 
 ## Cleaning and Exploratory Data Analysis
+
+[Back to Top](#table-of-contents)
 
 ### Data Cleaning
 
@@ -215,6 +221,8 @@ These states show notable figures in certain years (e.g., Florida in 2005 and Ar
 
 ## Assessment of Missingness
 
+[Back to Top](#table-of-contents)
+
 To explore whether missing values are Missing At Random (MAR) or Not Missing At Random (NMAR), we typically look for patterns in the missing data. If the presence of missing data is related to observed data, it might be MAR; if it's related to unobserved data, it might be NMAR. We visualized the number of missing values in each column. This allows us to focus more specifically on exploring the patterns of missingness within certain columns.
 
 <iframe src="figures/missing_values_proportion.html" width=800 height=600 frameBorder=0></iframe>
@@ -276,6 +284,8 @@ Since the p value after running permutation is test is 0.0049 which is smaller t
 
 ## Hypothesis Testing
 
+[Back to Top](#table-of-contents)
+
 To unravel the characteristics of major power outages with heightened severity, we have formulated a research question that focuses on the relationship between outage severity, as indicated by the number of customers affected. and total electricity sales. For our analysis, we've posited the following hypotheses:
 
 **Null Hypothesis**: The severity of major power outages ***is not related*** to the `TOTAL.SALES`.
@@ -297,6 +307,8 @@ Our statistical analysis, through the application of permutation tests, indicate
 
 ## Framing a Prediction Problem
 
+[Back to Top](#table-of-contents)
+
 Building on our comprehensive analysis of the factors affecting power outages and their impacts, we delve deeper into the nuanced interactions between these elements. Specifically, this study aims to ***discern whether a major power outage was caused by "severe weather"***—a classification task that entails predicting a binary outcome, leveraging the wealth of data available on past incidents. Understanding the primary causes of outages is paramount for devising more effective mitigation strategies, enhancing grid resilience, and ensuring the reliable delivery of electricity—a resource integral to the fabric of modern society. Accurate predictions can empower utility providers and policymakers with the insights needed to preemptively address vulnerabilities and manage resources adeptly.
 
 The focal point of our prediction is a binary classification of the `CAUSE.CATEGORY`, specifically determining if an outage was caused by *"severe weather"* as opposed to other causes. This binary approach streamlines our analysis, allowing for a targeted investigation into one of the most common and important causes of outages.
@@ -307,7 +319,7 @@ Our evaluation strategy employs accuracy as the primary metric, complemented by 
 
 In our predictive model for power outage causes, we meticulously select features that are known or estimable at the time of prediction, ensuring the model's utility in real-world scenarios. For instance:
 
-- **Price and Sales Related Features** (`RES.PRICE`, `COM.PRICE`, `IND.PRICE`, `TOTAL.PRICE`, `RES.SALES`, `COM.SALES`, `IND.SALES`, `TOTAL.SALES`)):  These features reflect the economic conditions leading up to an outage, which can be a factor in its cause.
+- **Price and Sales Related Features** (`RES.PRICE`, `COM.PRICE`, `IND.PRICE`, `TOTAL.PRICE`, `RES.SALES`, `COM.SALES`, `IND.SALES`, `TOTAL.SALES`):  These features reflect the economic conditions leading up to an outage, which can be a factor in its cause.
 - **Percentage and Customer Count Features** (`RES.PERCEN`, `COM.PERCEN`, `IND.PERCEN`, `RES.CUSTOMERS`, `COM.CUSTOMERS`, `IND.CUSTOMERS`, `TOTAL.CUSTOMERS`): These features represent the distribution and number of customers impacted by outages.
 - **Economic Indicators** (`PC.REALGSP.STATE`, `PC.REALGSP.USA`, `PC.REALGSP.REL`, `PC.REALGSP.CHANGE`, `UTIL.REALGSP`, `TOTAL.REALGSP`, `UTIL.CONTRI`, `PI.UTIL.OFUSA`): Economic health could be related to infrastructure investment and maintenance, which in turn could impact the likelihood of different outage causes.
 - **Demographic and Geographic Features** (`POPULATION`, `POPPCT_URBAN`, `POPPCT_UC`, `POPDEN_URBAN`, `POPDEN_UC`, `POPDEN_RURAL`, `AREAPCT_URBAN`, `AREAPCT_UC`, `PCT_LAND`, `PCT_WATER_TOT`, `PCT_WATER_INLAND`): Population density and urbanization can influence the complexity of the power network and the susceptibility to certain types of outages.
@@ -317,6 +329,8 @@ The above columns are all available at the time of the prediction.
 ---
 
 ## Baseline Model
+
+[Back to Top](#table-of-contents)
 
 Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine learning algorithm suited for classification tasks, to discern whether a power outage's cause was 'severe weather'. The model considers a wide array of features—**21 quantitative variables** such as `RES.PRICE`, `COM.PRICE`, and `POPULATION`, which reflect economic and demographic aspects without requiring preprocessing. Furthermore, temporal data from `OUTAGE.START` and `OUTAGE.RESTORATION` are treated as *ordinal* and undergo a transformation to extract year, month, day, and hour components, ensuring temporal nuances are captured. The response variable `CAUSE.CATEGORY`, are considered *nominal*.
 
@@ -365,6 +379,8 @@ We can observe that the scores for both classes ('False' and 'True') are relativ
 ---
 
 ## Final Model
+
+[Back to Top](#table-of-contents)
 
 Our final model was meticulously crafted to provide the most accurate predictions possible for the causes of severe weather-related power outages. It incorporates some categorical variables, which are dependent on other variables. We want to see if these categorical variables can increase the accuracy of our final model.
 
@@ -443,6 +459,8 @@ In conclusion, our final model has shown significant improvements in all metrics
 
 ## Fairness Analysis
 
+[Back to Top](#table-of-contents)
+
 Given the different climate types present in the various states of the United States, we hypothesize that climate may impact the accuracy of our model. We roughly categorize the `U.S._STATE` into a temperate and subtropical group, which includes states with a humid continental climate in the Northeast and Midwest, as well as states with a humid subtropical climate in the South; and an arid, semi-arid, and Mediterranean climate group, which includes states with arid and semi-arid climates in the West and Southwest, as well as California with its Mediterranean climate and the Pacific Northwest with its oceanic climate.
 
 ```py
@@ -482,5 +500,7 @@ Since the p value after running permutation is test is 0.0 which is smaller than
 ---
 
 ## References
+
+[Back to Top](#table-of-contents)
 
 Mukherjee, S., Nateghi, R., & Hastak, M. (2018). Data on major power outage events in the continental U.S. Data in Brief, 19, 2079–2083. https://doi.org/10.1016/j.dib.2018.06.067
