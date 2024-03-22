@@ -316,6 +316,7 @@ Our final model was meticulously crafted to provide the most accurate prediction
 Given the different climate types present in the various states of the United States, we hypothesize that climate may impact the accuracy of our model. We roughly categorize the `U.S._STATE` into a temperate and subtropical group, which includes states with a humid continental climate in the Northeast and Midwest, as well as states with a humid subtropical climate in the South; and an arid, semi-arid, and Mediterranean climate group, which includes states with arid and semi-arid climates in the West and Southwest, as well as California with its Mediterranean climate and the Pacific Northwest with its oceanic climate.
 
 **Group 1**: States with Temperate and subtropical climate
+
 **Group 2**: Stetes with Arid, semi-arid, and Mediterranean climate
 
 **Null hypothesis**: Our model is fair. The accuracy in states with temperate and subtropical climates (Group 1) and states with arid, semi-arid, and Mediterranean climates (Group 2) is roughly the same, and any differences are due to chance.
