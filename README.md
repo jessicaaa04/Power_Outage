@@ -367,12 +367,12 @@ And below is the classfication report of our baseline model:
 
 |            | Precision | Recall | F1-score | Support |
 |------------|-----------|--------|----------|---------|
-| False      | 0.77      | 0.81   | 0.79     | 267     |
-| True       | 0.80      | 0.76   | 0.78     | 267     |
+| False      | 0.75      | 0.81   | 0.77     | 260     |
+| True       | 0.83      | 0.76   | 0.80     | 274     |
 |            |           |        |          |         |
-| Accuracy   |           |        | 0.79     | 534     |
-| Macro Avg  | 0.79      | 0.79   | 0.79     | 534     |
-| Weighted Avg | 0.79    | 0.79   | 0.79     | 534     |
+| Accuracy   |           |        | 0.78     | 534     |
+| Macro Avg  | 0.78      | 0.79   | 0.78     | 534     |
+| Weighted Avg | 0.78    | 0.79   | 0.78     | 534     |
 
 We can observe that the scores for both classes ('False' and 'True') are relatively close, with scores around 0.77 to 0.80. These scores suggest a reasonably good baseline performance. However, there's still room for improvement, as we strive for higher precision and recall values which would indicate a more accurate and reliable model.
 
@@ -446,12 +446,12 @@ And below is the performance report of our final model:
 
 |            | Precision | Recall | F1-Score | Support |
 |------------|-----------|--------|----------|---------|
-| False      | 0.86      | 0.88   | 0.87     | 80      |
-| True       | 0.86      | 0.85   | 0.86     | 73      |
+| False      | 0.91      | 0.85   | 0.88     | 75      |
+| True       | 0.87      | 0.92   | 0.89     | 78      |
 |            |           |        |          |         |
-| Accuracy   |           |        | 0.86     | 153     |
-| Macro Avg  | 0.86      | 0.86   | 0.86     | 153     |
-| Weighted Avg | 0.86    | 0.86   | 0.86     | 153     |
+| Accuracy   |           |        | 0.89     | 153     |
+| Macro Avg  | 0.89      | 0.89   | 0.89     | 153     |
+| Weighted Avg | 0.89    | 0.89   | 0.89     | 153     |
 
 In conclusion, our final model has shown significant improvements in all metrics, including accuracy, recall, and f1 score. Therefore, it indicates that our final model has made great progress compared to the baseline model. Additionally, since our model's predictive accuracy has reached over 80%, we believe that our model's predictive performance is very well.
 
