@@ -250,7 +250,7 @@ To unravel the characteristics of major power outages with heightened severity, 
 **Null Hypothesis**: The severity of major power outages ***is not related*** to the `TOTAL.SALES`.
 **Alternative Hypothesis**: The severity of major power outages ***is related*** to the `TOTAL.SALES`.
 
-To test these hypotheses, we've implemented a permutation test that assesses the significance of the observed difference in means between outages with high and low total sales. Since the distribution is numerical, our test statistic is the **absolute difference** in the average number of customers affected for outages above and below the median of `TOTAL.SALES`. By randomly shuffling the `TOTAL.SALES` data and recalculating the difference in means 10,000 times, we simulate the distribution of our test statistic under the null hypothesis.
+To test these hypotheses, we've implemented a permutation test that used to investigate the relationship between the severity of power outages and total electricity sales. The method does not rely on any assumptions about the distribution of the data, making it robust to data that do not follow a normal distribution. Since the distribution is numerical, our test statistic is the **absolute difference in the average number of customers affected for outages above and below the median of `TOTAL.SALES`**. By randomly shuffling the `TOTAL.SALES` data and recalculating the difference in means 10,000 times, we simulate the distribution of our test statistic under the null hypothesis.
 
 Below is the empirical distribution of our test statistic, derived from these permutations, and the red line indicates the observed test statistic:
 
@@ -258,7 +258,9 @@ Below is the empirical distribution of our test statistic, derived from these pe
 
 **Significance Level**: 5%
 
-Since the p value after running permutation is test is 0.0 which is smaller than our chosen significance level of 5%, we **rejected the null hypothesis** that the severity of major power outages ***is not related*** to the `TOTAL.SALES`. 
+Since the p value after running permutation is test is 0.0 which is smaller than our chosen significance level of 5%, we **rejected the null hypothesis**, which states that the severity of major power outages ***is not related*** to the `TOTAL.SALES`. 
+
+Our statistical analysis, through the application of permutation tests, indicates that there is a statistically relationship between TOTAL.SALES and the severity of power outages, as measured by the number of customers affected. However, it's important to acknowledge that this finding doesn't confirm a causal relationship. To move closer to establishing causality, additional research incorporating a broader range of data and potentially experimental designs would be essential.
 
 ---
 
@@ -274,13 +276,63 @@ Our evaluation strategy employs accuracy as the primary metric, complemented by 
 
 ## Baseline Model
 
+Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine learning algorithm suited for classification tasks, to discern whether a power outage's cause was 'severe weather'. The model considers a wide array of features—21 quantitative variables such as `RES.PRICE`, `COM.PRICE`, and `POPULATION`, which reflect economic and demographic aspects without requiring preprocessing. Furthermore, temporal data from `OUTAGE.START` and `OUTAGE.RESTORATION` are treated as ordinal and undergo a transformation to extract year, month, day, and hour components, ensuring temporal nuances are captured. The response variable `CAUSE.CATEGORY`, are considered nominal.
+
+To facilitate model learning, the data were shuffled to ensure randomness and split into training and testing sets with the first 1000 rows for training and the rest for testing. Then, we fit the model to the training data set and used it for evaluation. This model actually got an overall accuracy of 0.79, indicating that it correctly predicts the cause of power outages 79% of the time. However, accuracy does not tell everything. We can also take look at other indicators such as precision, recall, and F1-score for both classes. 
+
+Below is the classfication report:
+
+|            | Precision | Recall | F1-score | Support |
+|------------|-----------|--------|----------|---------|
+| False      | 0.77      | 0.81   | 0.79     | 267     |
+| True       | 0.80      | 0.76   | 0.78     | 267     |
+|            |           |        |          |         |
+| Accuracy   |           |        | 0.79     | 534     |
+| Macro Avg  | 0.79      | 0.79   | 0.79     | 534     |
+| Weighted Avg | 0.79    | 0.79   | 0.79     | 534     |
+
+We can observe that the scores for both classes ('False' and 'True') are relatively close, with scores around 0.77 to 0.80. These scores suggest a reasonably good baseline performance. However, there's still room for improvement, as we strive for higher precision and recall values which would indicate a more accurate and reliable model.
+
 ---
 
 ## Final Model
 
---
+Our final model was meticulously crafted to provide the most accurate predictions possible for the causes of severe weather-related power outages. It incorporates some categorical variables.
+
+### Feature Selection
+
+- **U.S._STATE and NERC.REGION**: These features introduce a geographic dimension to the model, considering that different states may have varying patterns that can influence the likelihood of outages.
+
+- **CLIMATE.CATEGORY and CLIMATE.REGION**: Including climate-related variables allows the model to account for environmental factors that significantly impact power outage causes and severities.
+
+### Modeling Algorithm and Hyperparameters
+
+
+
+---
 
 ## Fairness Analysis
+
+Given the different climate types present in the various states of the United States, we hypothesize that climate may impact the accuracy of our model. We roughly categorize the `U.S._STATE` into a temperate and subtropical group, which includes states with a humid continental climate in the Northeast and Midwest, as well as states with a humid subtropical climate in the South; and an arid, semi-arid, and Mediterranean climate group, which includes states with arid and semi-arid climates in the West and Southwest, as well as California with its Mediterranean climate and the Pacific Northwest with its oceanic climate.
+
+**Group 1**: States with Temperate and subtropical climate
+**Group 2**: Stetes with Arid, semi-arid, and Mediterranean climate
+
+**Null hypothesis**: Our model is fair. The accuracy in states with temperate and subtropical climates (Group 1) and states with arid, semi-arid, and Mediterranean climates (Group 2) is roughly the same, and any differences are due to chance.
+
+**Alternative hypothesis**: Our model is not fair. The accuracy in states with temperate and subtropical climates (Group 1) and states with arid, semi-arid, and Mediterranean climates (Group 2) is not the same.
+
+**Test statistic**: The difference in accuracy rates between states with temperate and subtropical climates (Group 1) and states with arid, semi-arid, and Mediterranean climates (Group 2).
+
+**Significance level**: 0.05
+
+Then we conducted a permutation test to examine whether there's a statistically significant difference in predictions between two groups of states, classified as either 'Temperate/Subtropical' or 'Arid/Mediterranean', based on their climate. We shuffled the accuracy and then computed the difference in mean accuracy for the shuffled data.
+
+Below shows the empirical distribution of our test statistics in 10,000 permutations, and the red line indicates the observed test statistic:
+
+<iframe src="figures/fairness.html" width=800 height=600 frameBorder=0></iframe>
+
+Since the p value after running permutation is test is 0.0 which is smaller than our chosen significance level of 5%, we **rejected the null hypothesis**, which states that the model is fair. One possible reason is that different climate types indeed lead to differences in prediction accuracy, but more specific reasons require further analysis. 
 
 ---
 
