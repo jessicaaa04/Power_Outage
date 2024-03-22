@@ -10,6 +10,37 @@ This is a data science project on predicting the causes of a major power outage.
 
 ---
 
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Introduction](#introduction)
+    - [Introduction to the Dataset in the Study](#introduction-to-the-dataset-in-the-study)
+3. [Cleaning and Exploratory Data Analysis](#cleaning-and-exploratory-data-analysis)
+    - [Data Cleaning](#data-cleaning)
+    - [Univariate Analysis](#univariate-analysis)
+        - [Distribution of Duration in Hours](#distribution-of-duration-in-hours)
+        - [Distribution of Anomaly Level](#distribution-of-anomaly-level)
+    - [Bivariate Analysis](#bivariate-analysis)
+    - [Interesting Aggregates](#interesting-aggregates)
+4. [Assessment of Missingness](#assessment-of-missingness)
+    - [NMAR Analysis](#nmar-analysis)
+    - [Missingness Dependency](#missingness-dependency)
+5. [Hypothesis Testing](#hypothesis-testing)
+    - [Framing a Prediction Problem](#framing-a-prediction-problem)
+        - [At the "Time of Prediction"](#at-the-time-of-prediction)
+6. [Baseline Model](#baseline-model)
+    - [Feature Engineering](#feature-engineering)
+7. [Final Model](#final-model)
+    - [Feature Selection](#feature-selection)
+    - [Modeling Selection](#modeling-selection)
+    - [Finding Hyperparameters](#finding-hyperparameters)
+    - [KFold Cross Validation](#kfold-cross-validation)
+    - [Comparison with Baseline Model](#comparison-with-baseline-model)
+8. [Fairness Analysis](#fairness-analysis)
+9. [References](#references)
+
+---
+
 ## Introduction
 
 Power exists everywhere in our lives, woven into the fabric of our daily routines and essential activities. We use power to brighten our homes, to charge the devices that keep us connected to the world, and to preserve the food that nourishes us. Imagine this: You're about to sit down for a family dinner or dive into a critical work project when suddenly, everything goes dark. The power's out, again. Frustration kicks in, plans get disrupted, and the uncertainty of when things will return to normal looms over you. This scenario is far too common for many of us and highlights a pressing issue in our modern lives—the vulnerability of our power systems to outages. The Department of Energy defines large outages as those that impact at least 50,000 customers or result in an unscheduled firm load loss of at least 300 MW (Mukherjee et al. 2018).  *In order to minimize the inconveniences associated with power outages, we will uncover the cause of a major power outage in U.S.*
@@ -272,11 +303,22 @@ The focal point of our prediction is a binary classification of the `CAUSE.CATEG
 
 Our evaluation strategy employs accuracy as the primary metric, complemented by a confusion matrix and a comprehensive classification report. The use of accuracy helps us directly assess the proportion of correct predictions made by the model, offering an intuitive understanding of its effectiveness.
 
+### At the "Time of Prediction"
+
+In our predictive model for power outage causes, we meticulously select features that are known or estimable at the time of prediction, ensuring the model's utility in real-world scenarios. For instance:
+
+- **Price and Sales Related Features** (`RES.PRICE`, `COM.PRICE`, `IND.PRICE`, `TOTAL.PRICE`, `RES.SALES`, `COM.SALES`, `IND.SALES`, `TOTAL.SALES`)):  These features reflect the economic conditions leading up to an outage, which can be a factor in its cause.
+- **Percentage and Customer Count Features** (`RES.PERCEN`, `COM.PERCEN`, `IND.PERCEN`, `RES.CUSTOMERS`, `COM.CUSTOMERS`, `IND.CUSTOMERS`, `TOTAL.CUSTOMERS`): These features represent the distribution and number of customers impacted by outages.
+- **Economic Indicators** (`PC.REALGSP.STATE`, `PC.REALGSP.USA`, `PC.REALGSP.REL`, `PC.REALGSP.CHANGE`, `UTIL.REALGSP`, `TOTAL.REALGSP`, `UTIL.CONTRI`, `PI.UTIL.OFUSA`): Economic health could be related to infrastructure investment and maintenance, which in turn could impact the likelihood of different outage causes.
+- **Demographic and Geographic Features** (`POPULATION`, `POPPCT_URBAN`, `POPPCT_UC`, `POPDEN_URBAN`, `POPDEN_UC`, `POPDEN_RURAL`, `AREAPCT_URBAN`, `AREAPCT_UC`, `PCT_LAND`, `PCT_WATER_TOT`, `PCT_WATER_INLAND`): Population density and urbanization can influence the complexity of the power network and the susceptibility to certain types of outages.
+
+The above columns are all available at the time of the prediction.
+
 ---
 
 ## Baseline Model
 
-Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine learning algorithm suited for classification tasks, to discern whether a power outage's cause was 'severe weather'. The model considers a wide array of features—21 quantitative variables such as `RES.PRICE`, `COM.PRICE`, and `POPULATION`, which reflect economic and demographic aspects without requiring preprocessing. Furthermore, temporal data from `OUTAGE.START` and `OUTAGE.RESTORATION` are treated as ordinal and undergo a transformation to extract year, month, day, and hour components, ensuring temporal nuances are captured. The response variable `CAUSE.CATEGORY`, are considered nominal.
+Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine learning algorithm suited for classification tasks, to discern whether a power outage's cause was 'severe weather'. The model considers a wide array of features—**21 quantitative variables** such as `RES.PRICE`, `COM.PRICE`, and `POPULATION`, which reflect economic and demographic aspects without requiring preprocessing. Furthermore, temporal data from `OUTAGE.START` and `OUTAGE.RESTORATION` are treated as *ordinal* and undergo a transformation to extract year, month, day, and hour components, ensuring temporal nuances are captured. The response variable `CAUSE.CATEGORY`, are considered *nominal*.
 
 ### Feature Engineering
 
@@ -303,7 +345,11 @@ Pipeline(steps=[('ct',
 
 This model actually got an overall accuracy of 0.79, indicating that it correctly predicts the cause of power outages 79% of the time. However, accuracy does not tell everything. We can also take look at other indicators such as precision, recall, and F1-score for both classes. 
 
-Below is the classfication report of our baseline model:
+The confusion matrix for this base model is illustrated as below:
+
+<iframe src="figures/confusion_matrix1.html" width=800 height=600 frameBorder=0></iframe>
+
+And below is the classfication report of our baseline model:
 
 |            | Precision | Recall | F1-score | Support |
 |------------|-----------|--------|----------|---------|
@@ -376,7 +422,11 @@ After iteratively training and testing the model on different subsets of the dat
 
 We fit the final model to the same training data set. Compared to the baseline model, we have higher accuracy scores which shows that our final model has improved.
 
-Below is the performance report of our final model:
+The confusion matrix for the final model is illustrated as below:
+
+<iframe src="figures/confusion_matrix2.html" width=800 height=600 frameBorder=0></iframe>
+
+And below is the performance report of our final model:
 
 |            | Precision | Recall | F1-Score | Support |
 |------------|-----------|--------|----------|---------|
@@ -394,6 +444,20 @@ In conclusion, our final model has shown significant improvements in all metrics
 ## Fairness Analysis
 
 Given the different climate types present in the various states of the United States, we hypothesize that climate may impact the accuracy of our model. We roughly categorize the `U.S._STATE` into a temperate and subtropical group, which includes states with a humid continental climate in the Northeast and Midwest, as well as states with a humid subtropical climate in the South; and an arid, semi-arid, and Mediterranean climate group, which includes states with arid and semi-arid climates in the West and Southwest, as well as California with its Mediterranean climate and the Pacific Northwest with its oceanic climate.
+
+```py
+temperate_subtropical_states = ['Massachusetts', 'Connecticut', 'Rhode Island', 'New Hampshire', 'Vermont',
+                                'Maine', 'Ohio', 'Michigan', 'Indiana', 'Illinois', 'Wisconsin', 'Minnesota',
+                                'Iowa', 'Missouri', 'North Dakota', 'South Dakota', 'Nebraska', 'Kansas',
+                                'Virginia', 'North Carolina', 'South Carolina', 'Georgia', 'Florida', 'Kentucky',
+                                'Tennessee', 'Alabama', 'Mississippi', 'Arkansas', 'Louisiana', 'West Virginia',
+                                'New York', 'New Jersey', 'Pennsylvania', 'Maryland', 'Delaware',
+                                'District of Columbia']
+
+arid_mediterranean_states = ['Nevada', 'Arizona', 'Utah', 'New Mexico', 'Texas', 'Oklahoma', 'Colorado',
+                             'Washington', 'Oregon', 'Idaho', 'Montana', 'Wyoming', 'California', 'Alaska',
+                             'Hawaii']
+```
 
 **Group 1**: States with Temperate and subtropical climate
 
