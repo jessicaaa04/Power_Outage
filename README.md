@@ -278,7 +278,30 @@ Our evaluation strategy employs accuracy as the primary metric, complemented by 
 
 Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine learning algorithm suited for classification tasks, to discern whether a power outage's cause was 'severe weather'. The model considers a wide array of features—21 quantitative variables such as `RES.PRICE`, `COM.PRICE`, and `POPULATION`, which reflect economic and demographic aspects without requiring preprocessing. Furthermore, temporal data from `OUTAGE.START` and `OUTAGE.RESTORATION` are treated as ordinal and undergo a transformation to extract year, month, day, and hour components, ensuring temporal nuances are captured. The response variable `CAUSE.CATEGORY`, are considered nominal.
 
-To facilitate model learning, the data were shuffled to ensure randomness and split into training and testing sets with the first 1000 rows for training and the rest for testing. Then, we fit the model to the training data set and used it for evaluation. This model actually got an overall accuracy of 0.79, indicating that it correctly predicts the cause of power outages 79% of the time. However, accuracy does not tell everything. We can also take look at other indicators such as precision, recall, and F1-score for both classes. 
+### Feature Engineering
+
+To increase the performance of our baseline model, we did feature engineering on some columns.
+
+- - **Column Transformation**: The `ColumnTransformer` applies the helper_function to the specified datetime columns while passing through the other columns unchanged. This step ensures that the model can use both the extracted time features and any other relevant features in the dataset.
+
+- **Imputation**: The `SimpleImputer` is used to fill in any missing values in the dataset. This is important because machine learning models require complete data to make accurate predictions.
+
+To facilitate model learning, the data were shuffled to ensure randomness and split into training and testing sets with the first 1000 rows for training and the rest for testing. Then, we fit the model to the training data set and used it for evaluation. 
+
+Below is our baseline model:
+
+```py
+Pipeline(steps=[('ct',
+                 ColumnTransformer(remainder='passthrough',
+                                   transformers=[('timestrap',
+                                                  FunctionTransformer(func=<function helper_function at 0x2880ea9d0>),
+                                                  ['OUTAGE.START',
+                                                   'OUTAGE.RESTORATION'])])),
+                ('impute', SimpleImputer()),
+                ('gbdt', HistGradientBoostingClassifier())])
+```
+
+This model actually got an overall accuracy of 0.79, indicating that it correctly predicts the cause of power outages 79% of the time. However, accuracy does not tell everything. We can also take look at other indicators such as precision, recall, and F1-score for both classes. 
 
 Below is the classfication report of our baseline model:
 
@@ -297,7 +320,7 @@ We can observe that the scores for both classes ('False' and 'True') are relativ
 
 ## Final Model
 
-Our final model was meticulously crafted to provide the most accurate predictions possible for the causes of severe weather-related power outages. It incorporates some categorical variables.
+Our final model was meticulously crafted to provide the most accurate predictions possible for the causes of severe weather-related power outages. It incorporates some categorical variables, which are dependent on other variables. We want to see if these categorical variables can increase the accuracy of our final model.
 
 ### Feature Selection
 
@@ -307,6 +330,8 @@ Our final model was meticulously crafted to provide the most accurate prediction
 
 For those categorical features, they are one-hot encoded to convert these nominal variables into a format that can be provided to the machine learning algorithms, enhancing the model's interpretability of geographical and climate influences.
 
+Also, we maintained the same feature engineering methods as the baseline model, such as transformations for time features, imputation, and column transformers.
+
 ### Modeling Selection
 
 Selected Model: HistGradientBoostingClassifier
@@ -314,6 +339,24 @@ Selected Model: HistGradientBoostingClassifier
 - The model operates by converting continuous features into discrete bins, a process that significantly enhances computational efficiency and allows the model to scale with large datasets—a crucial capability given the diverse and voluminous data involved in power outage analysis. Through its gradient boosting framework, the algorithm iteratively builds a series of decision trees, each designed to correct the residuals or mistakes of the previous trees. This sequential correction process, grounded in gradient descent, refines the model's accuracy with each step.
 
 Our model benefits immensely from this approach. The ensemble technique, which aggregates predictions from multiple trees, ensures a robust final prediction that accounts for various nuances and patterns in the data. This is particularly advantageous for our task, where factors influencing power outages can be subtle and multifaceted, ranging from geographical and temporal to climatic variables.
+
+Below is our final model:
+
+```py
+Pipeline(steps=[('ct',
+                 ColumnTransformer(remainder='passthrough',
+                                   transformers=[('timestrap',
+                                                  FunctionTransformer(func=<function pl_final.<locals>.helper_function at 0x288e3c670>),
+                                                  ['OUTAGE.START',
+                                                   'OUTAGE.RESTORATION']),
+                                                 ('onehot',
+                                                  OneHotEncoder(handle_unknown='ignore'),
+                                                  ['U.S._STATE', 'NERC.REGION',
+                                                   'CLIMATE.CATEGORY',
+                                                   'CLIMATE.REGION'])])),
+                ('impute', SimpleImputer()),
+                ('gbdt', HistGradientBoostingClassifier(max_depth=18))])
+```
 
 ### Finding Hyperparameters
 
@@ -323,12 +366,11 @@ Hyperparameter tuning for this classifier is a nuanced process, aimed at refinin
 
 To choose the best hyperparameter, we implemented GridSearchCV with a 5-fold cross-validation. It carefully tests several combinations of hyperparameters to determine which combination is the most effective. By utilizing a range of values for max_depth (from 10 to 20, stepping by 2), we allow GridSearchCV to assess how different tree depths affect performance. 
 
-In the end, the best hyperparameter is **max_depth = 18**.
-
-
 ### KFold Cross Validation
 
 We employed a KFold cross-validation strategy with 10 splits, a rigorous method ensuring that every observation in our dataset is used for both training and validation. This technique provides a comprehensive assessment of our model's predictive capabilities across different subsets of data.
+
+After iteratively training and testing the model on different subsets of the dataset, it returns an average accuracy of **0.8455097190391306**. Hence, we can conclude that our final model has an average accuracy of approximately 83%, which is a 5% improvement over the baseline model. The final model’s enhanced feature set, coupled with a rigorous hyperparameter optimization process, delivers a more reliable and robust tool for predicting the causes of major power outages, thereby improving upon the baseline model's initial groundwork.
 
 ### Comparison with Baseline Model
 
@@ -338,16 +380,14 @@ Below is the performance report of our final model:
 
 |            | Precision | Recall | F1-Score | Support |
 |------------|-----------|--------|----------|---------|
-| False      | 0.81      | 0.77   | 0.79     | 73      |
-| True       | 0.80      | 0.84   | 0.82     | 80      |
+| False      | 0.86      | 0.88   | 0.87     | 80      |
+| True       | 0.86      | 0.85   | 0.86     | 73      |
 |            |           |        |          |         |
-| Accuracy   |           |        | 0.80     | 153     |
-| Macro Avg  | 0.80      | 0.80   | 0.80     | 153     |
-| Weighted Avg | 0.80    | 0.80   | 0.80     | 153     |
+| Accuracy   |           |        | 0.86     | 153     |
+| Macro Avg  | 0.86      | 0.86   | 0.86     | 153     |
+| Weighted Avg | 0.86    | 0.86   | 0.86     | 153     |
 
-In conclusion, the final model’s enhanced feature set, coupled with a rigorous hyperparameter optimization process, delivers a more reliable and robust tool for predicting the causes of major power outages, thereby improving upon the baseline model's initial groundwork.
-
-However, the accuracy score doesn't increase a lot. In the future, we look for additional data sources or derive new features that could have a predictive signal. 
+In conclusion, our final model has shown significant improvements in all metrics, including accuracy, recall, and f1 score. Therefore, it indicates that our final model has made great progress compared to the baseline model. Additionally, since our model's predictive accuracy has reached over 80%, we believe that our model's predictive performance is very well.
 
 ---
 
