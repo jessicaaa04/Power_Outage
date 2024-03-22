@@ -340,6 +340,14 @@ Selected Model: HistGradientBoostingClassifier
 
 Our model benefits immensely from this approach. The ensemble technique, which aggregates predictions from multiple trees, ensures a robust final prediction that accounts for various nuances and patterns in the data. This is particularly advantageous for our task, where factors influencing power outages can be subtle and multifaceted, ranging from geographical and temporal to climatic variables.
 
+### Finding Hyperparameters
+
+Hyperparameter tuning for this classifier is a nuanced process, aimed at refining the model to achieve a delicate balance between learning from the data and generalizing well to unseen data. 
+
+- **Max Depth**: It is the maximum number of levels allowed in each decision tree. Setting the max depth too low can prevent the model from capturing complex patterns in the data, leading to underfitting. Conversely, a very high max depth can result in overly complex models that overfit the training data.
+
+To choose the best hyperparameter, we implemented GridSearchCV with a 5-fold cross-validation. It carefully tests several combinations of hyperparameters to determine which combination is the most effective. By utilizing a range of values for max_depth (from 10 to 20, stepping by 2), we allow GridSearchCV to assess how different tree depths affect performance. 
+
 Below is our final model:
 
 ```py
@@ -357,14 +365,6 @@ Pipeline(steps=[('ct',
                 ('impute', SimpleImputer()),
                 ('gbdt', HistGradientBoostingClassifier(max_depth=18))])
 ```
-
-### Finding Hyperparameters
-
-Hyperparameter tuning for this classifier is a nuanced process, aimed at refining the model to achieve a delicate balance between learning from the data and generalizing well to unseen data. 
-
-- **Max Depth**: It is the maximum number of levels allowed in each decision tree. Setting the max depth too low can prevent the model from capturing complex patterns in the data, leading to underfitting. Conversely, a very high max depth can result in overly complex models that overfit the training data.
-
-To choose the best hyperparameter, we implemented GridSearchCV with a 5-fold cross-validation. It carefully tests several combinations of hyperparameters to determine which combination is the most effective. By utilizing a range of values for max_depth (from 10 to 20, stepping by 2), we allow GridSearchCV to assess how different tree depths affect performance. 
 
 ### KFold Cross Validation
 
