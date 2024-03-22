@@ -280,7 +280,7 @@ Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine 
 
 To facilitate model learning, the data were shuffled to ensure randomness and split into training and testing sets with the first 1000 rows for training and the rest for testing. Then, we fit the model to the training data set and used it for evaluation. This model actually got an overall accuracy of 0.79, indicating that it correctly predicts the cause of power outages 79% of the time. However, accuracy does not tell everything. We can also take look at other indicators such as precision, recall, and F1-score for both classes. 
 
-Below is the classfication report:
+Below is the classfication report of our baseline model:
 
 |            | Precision | Recall | F1-score | Support |
 |------------|-----------|--------|----------|---------|
@@ -305,9 +305,49 @@ Our final model was meticulously crafted to provide the most accurate prediction
 
 - **CLIMATE.CATEGORY and CLIMATE.REGION**: Including climate-related variables allows the model to account for environmental factors that significantly impact power outage causes and severities.
 
-### Modeling Algorithm and Hyperparameters
+For those categorical features, they are one-hot encoded to convert these nominal variables into a format that can be provided to the machine learning algorithms, enhancing the model's interpretability of geographical and climate influences.
+
+### Modeling Selection
+
+Selected Model: HistGradientBoostingClassifier
+
+- The model operates by converting continuous features into discrete bins, a process that significantly enhances computational efficiency and allows the model to scale with large datasets—a crucial capability given the diverse and voluminous data involved in power outage analysis. Through its gradient boosting framework, the algorithm iteratively builds a series of decision trees, each designed to correct the residuals or mistakes of the previous trees. This sequential correction process, grounded in gradient descent, refines the model's accuracy with each step.
+
+Our model benefits immensely from this approach. The ensemble technique, which aggregates predictions from multiple trees, ensures a robust final prediction that accounts for various nuances and patterns in the data. This is particularly advantageous for our task, where factors influencing power outages can be subtle and multifaceted, ranging from geographical and temporal to climatic variables.
+
+### Finding Hyperparameters
+
+Hyperparameter tuning for this classifier is a nuanced process, aimed at refining the model to achieve a delicate balance between learning from the data and generalizing well to unseen data. 
+
+- **Max Depth**: It is the maximum number of levels allowed in each decision tree. Setting the max depth too low can prevent the model from capturing complex patterns in the data, leading to underfitting. Conversely, a very high max depth can result in overly complex models that overfit the training data.
+
+To choose the best hyperparameter, we implemented GridSearchCV with a 5-fold cross-validation. It carefully tests several combinations of hyperparameters to determine which combination is the most effective. By utilizing a range of values for max_depth (from 10 to 20, stepping by 2), we allow GridSearchCV to assess how different tree depths affect performance. 
+
+In the end, the best hyperparameter is **max_depth = 18**.
 
 
+### KFold Cross Validation
+
+We employed a KFold cross-validation strategy with 10 splits, a rigorous method ensuring that every observation in our dataset is used for both training and validation. This technique provides a comprehensive assessment of our model's predictive capabilities across different subsets of data.
+
+### Comparison with Baseline Model
+
+We fit the final model to the same training data set. Compared to the baseline model, we have higher accuracy scores which shows that our final model has improved.
+
+Below is the performance report of our final model:
+
+|            | Precision | Recall | F1-Score | Support |
+|------------|-----------|--------|----------|---------|
+| False      | 0.81      | 0.77   | 0.79     | 73      |
+| True       | 0.80      | 0.84   | 0.82     | 80      |
+|            |           |        |          |         |
+| Accuracy   |           |        | 0.80     | 153     |
+| Macro Avg  | 0.80      | 0.80   | 0.80     | 153     |
+| Weighted Avg | 0.80    | 0.80   | 0.80     | 153     |
+
+In conclusion, the final model’s enhanced feature set, coupled with a rigorous hyperparameter optimization process, delivers a more reliable and robust tool for predicting the causes of major power outages, thereby improving upon the baseline model's initial groundwork.
+
+However, the accuracy score doesn't increase a lot. In the future, we look for additional data sources or derive new features that could have a predictive signal. 
 
 ---
 
