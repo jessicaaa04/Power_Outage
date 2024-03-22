@@ -338,7 +338,7 @@ Our baseline model employs a *HistGradientBoostingClassifier*, a robust machine 
 
 To increase the performance of our baseline model, we did feature engineering on some columns.
 
-- - **Column Transformation**: The `ColumnTransformer` applies the helper_function to the specified datetime columns while passing through the other columns unchanged. This step ensures that the model can use both the extracted time features and any other relevant features in the dataset.
+- **Column Transformation**: The `ColumnTransformer` applies the helper_function to the specified datetime columns while passing through the other columns unchanged. This step ensures that the model can use both the extracted time features and any other relevant features in the dataset.
 
 - **Imputation**: The `SimpleImputer` is used to fill in any missing values in the dataset. This is important because machine learning models require complete data to make accurate predictions.
 
